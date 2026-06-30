@@ -1,5 +1,7 @@
-import StickerCard from './StickerCard.jsx'
 import { IconStar } from './icons.jsx'
+import mexicoCard from '../assets/mexico.png'
+import uruguaiCard from '../assets/uruguai.png'
+import portugalCard from '../assets/portugal.png'
 
 function Hero({ onStart }) {
   return (
@@ -33,14 +35,23 @@ function Hero({ onStart }) {
           </button>
         </div>
 
-        <div className="relative flex justify-center">
+        <div className="relative flex h-72 items-center justify-center sm:h-96">
           <div className="absolute h-72 w-72 rounded-full bg-brand-100 blur-2xl sm:h-96 sm:w-96" />
-          <StickerCard
-            className="relative w-56 sm:w-72"
-            name="Miguel Souza"
-            dob="15-03-2018"
-            club="Estrelinha FC"
-            featured
+
+          <img
+            src={mexicoCard}
+            alt="Example sticker card for Mexico"
+            className="absolute w-36 -translate-x-20 -rotate-6 rounded-2xl shadow-xl ring-1 ring-black/10 sm:w-48 sm:-translate-x-28"
+          />
+          <img
+            src={portugalCard}
+            alt="Example sticker card for Portugal"
+            className="absolute w-36 translate-x-20 rotate-6 rounded-2xl shadow-xl ring-1 ring-black/10 sm:w-48 sm:translate-x-28"
+          />
+          <img
+            src={uruguaiCard}
+            alt="Example sticker card for Uruguay"
+            className="relative w-44 rounded-2xl shadow-2xl ring-1 ring-black/10 sm:w-60"
           />
         </div>
       </div>
