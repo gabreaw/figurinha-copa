@@ -32,18 +32,6 @@ function StepName({ data, onChange }) {
 
   return (
     <div>
-      <div className="mb-6 text-center">
-        <span className="text-3xl" aria-hidden="true">
-          ✍️
-        </span>
-        <h2 className="font-display mt-2 text-3xl tracking-wide text-brand-950">
-          WHAT'S THE PLAYER'S NAME?
-        </h2>
-        <p className="mt-1 text-sm text-neutral-500">
-          This is the name that will appear on the sticker
-        </p>
-      </div>
-
       <label className="mb-6 block">
         <span className="sr-only">Full name</span>
         <input

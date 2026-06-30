@@ -13,19 +13,7 @@ function StepReview({ data }) {
 
   return (
     <div>
-      <div className="mb-6 text-center">
-        <span className="text-3xl" aria-hidden="true">
-          🔍
-        </span>
-        <h2 className="font-display mt-2 text-3xl tracking-wide text-brand-950">
-          REVIEW & GENERATE
-        </h2>
-        <p className="mt-1 text-sm text-neutral-500">
-          Check everything looks right before we create the sticker
-        </p>
-      </div>
-
-      <div className="mb-6 flex justify-center">
+      <div className="mb-6 flex justify-center lg:hidden">
         <StickerCard
           className="w-40"
           name={data.name || 'Player name'}

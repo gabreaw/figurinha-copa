@@ -11,18 +11,6 @@ function StepClubBody({ data, onChange }) {
 
   return (
     <div>
-      <div className="mb-6 text-center">
-        <span className="text-3xl" aria-hidden="true">
-          ⚽
-        </span>
-        <h2 className="font-display mt-2 text-3xl tracking-wide text-brand-950">
-          CLUB & MEASUREMENTS
-        </h2>
-        <p className="mt-1 text-sm text-neutral-500">
-          Just like the real player cards
-        </p>
-      </div>
-
       <label className="mb-4 block">
         <span className="mb-2 block text-xs font-semibold tracking-wide text-neutral-700 uppercase">
           Club name

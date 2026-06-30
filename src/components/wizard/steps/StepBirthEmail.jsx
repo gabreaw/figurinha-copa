@@ -10,18 +10,6 @@ function StepBirthEmail({ data, onChange }) {
 
   return (
     <div>
-      <div className="mb-6 text-center">
-        <span className="text-3xl" aria-hidden="true">
-          🎂
-        </span>
-        <h2 className="font-display mt-2 text-3xl tracking-wide text-brand-950">
-          WHEN WERE THEY BORN?
-        </h2>
-        <p className="mt-1 text-sm text-neutral-500">
-          We'll use this for the sticker details and to send your card
-        </p>
-      </div>
-
       <label className="mb-4 block">
         <span className="mb-2 block text-xs font-semibold tracking-wide text-neutral-700 uppercase">
           Date of birth
