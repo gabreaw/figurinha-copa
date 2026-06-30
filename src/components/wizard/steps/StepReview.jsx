@@ -1,9 +1,10 @@
 import StickerCard from '../../StickerCard.jsx'
+import { formatDateLong, formatDateShort } from '../validators.js'
 
 function StepReview({ data }) {
   const rows = [
     ['Name', data.name || '—'],
-    ['Date of birth', data.dob || '—'],
+    ['Date of birth', data.dob ? formatDateLong(data.dob) : '—'],
     ['Email', data.email || '—'],
     ['Club', data.club || '—'],
     ['Height', data.height ? `${data.height} m` : '—'],
@@ -28,7 +29,7 @@ function StepReview({ data }) {
         <StickerCard
           className="w-40"
           name={data.name || 'Player name'}
-          dob={data.dob || 'DOB'}
+          dob={data.dob ? formatDateShort(data.dob) : 'DOB'}
           club={data.club || 'Club'}
           photo={data.photoPreview}
           featured

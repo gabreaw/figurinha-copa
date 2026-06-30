@@ -1,8 +1,33 @@
+import { useState } from 'react'
+import { validateName } from '../validators.js'
+
+const MAX_PHOTO_BYTES = 8 * 1024 * 1024
+
 function StepName({ data, onChange }) {
+  const [touched, setTouched] = useState(false)
+  const nameError = touched ? validateName(data.name) : null
+
   const handlePhoto = (e) => {
     const file = e.target.files?.[0]
+    e.target.value = ''
     if (!file) return
-    onChange({ photo: file, photoPreview: URL.createObjectURL(file) })
+
+    if (!file.type.startsWith('image/')) {
+      onChange({ photoError: 'Please select an image file' })
+      return
+    }
+    if (file.size > MAX_PHOTO_BYTES) {
+      onChange({ photoError: 'Image must be smaller than 8MB' })
+      return
+    }
+
+    if (data.photoPreview) URL.revokeObjectURL(data.photoPreview)
+    onChange({ photo: file, photoPreview: URL.createObjectURL(file), photoError: null })
+  }
+
+  const removePhoto = () => {
+    if (data.photoPreview) URL.revokeObjectURL(data.photoPreview)
+    onChange({ photo: null, photoPreview: null, photoError: null })
   }
 
   return (
@@ -23,11 +48,17 @@ function StepName({ data, onChange }) {
         <span className="sr-only">Full name</span>
         <input
           type="text"
+          autoFocus
           placeholder="First and last name"
           value={data.name}
           onChange={(e) => onChange({ name: e.target.value })}
-          className="w-full rounded-xl border border-neutral-300 px-4 py-3 text-neutral-900 placeholder-neutral-400 outline-none focus:border-brand-700"
+          onBlur={() => setTouched(true)}
+          aria-invalid={Boolean(nameError)}
+          className={`w-full rounded-xl border px-4 py-3 text-neutral-900 placeholder-neutral-400 outline-none focus:border-brand-700 ${
+            nameError ? 'border-red-400' : 'border-neutral-300'
+          }`}
         />
+        {nameError && <p className="mt-1.5 text-xs text-red-600">{nameError}</p>}
       </label>
 
       <div>
@@ -74,6 +105,20 @@ function StepName({ data, onChange }) {
             />
           </label>
         </div>
+
+        {data.photoError && (
+          <p className="mt-1.5 text-xs text-red-600">{data.photoError}</p>
+        )}
+
+        {data.photoPreview && (
+          <button
+            type="button"
+            onClick={removePhoto}
+            className="mt-2 text-xs font-semibold text-neutral-500 hover:text-red-600"
+          >
+            Remove photo
+          </button>
+        )}
       </div>
     </div>
   )

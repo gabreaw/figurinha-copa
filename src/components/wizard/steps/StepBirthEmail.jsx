@@ -1,4 +1,13 @@
+import { useState } from 'react'
+import { validateDob, validateEmail, todayISO } from '../validators.js'
+
 function StepBirthEmail({ data, onChange }) {
+  const [touched, setTouched] = useState({ dob: false, email: false })
+  const dobError = touched.dob ? validateDob(data.dob) : null
+  const emailError = touched.email ? validateEmail(data.email) : null
+
+  const markTouched = (field) => setTouched((prev) => ({ ...prev, [field]: true }))
+
   return (
     <div>
       <div className="mb-6 text-center">
@@ -19,10 +28,17 @@ function StepBirthEmail({ data, onChange }) {
         </span>
         <input
           type="date"
+          autoFocus
+          max={todayISO()}
           value={data.dob}
           onChange={(e) => onChange({ dob: e.target.value })}
-          className="w-full rounded-xl border border-neutral-300 px-4 py-3 text-neutral-900 outline-none focus:border-brand-700"
+          onBlur={() => markTouched('dob')}
+          aria-invalid={Boolean(dobError)}
+          className={`w-full rounded-xl border px-4 py-3 text-neutral-900 outline-none focus:border-brand-700 ${
+            dobError ? 'border-red-400' : 'border-neutral-300'
+          }`}
         />
+        {dobError && <p className="mt-1.5 text-xs text-red-600">{dobError}</p>}
       </label>
 
       <label className="block">
@@ -34,8 +50,13 @@ function StepBirthEmail({ data, onChange }) {
           placeholder="you@example.com"
           value={data.email}
           onChange={(e) => onChange({ email: e.target.value })}
-          className="w-full rounded-xl border border-neutral-300 px-4 py-3 text-neutral-900 placeholder-neutral-400 outline-none focus:border-brand-700"
+          onBlur={() => markTouched('email')}
+          aria-invalid={Boolean(emailError)}
+          className={`w-full rounded-xl border px-4 py-3 text-neutral-900 placeholder-neutral-400 outline-none focus:border-brand-700 ${
+            emailError ? 'border-red-400' : 'border-neutral-300'
+          }`}
         />
+        {emailError && <p className="mt-1.5 text-xs text-red-600">{emailError}</p>}
       </label>
     </div>
   )

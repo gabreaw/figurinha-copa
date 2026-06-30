@@ -5,6 +5,14 @@ import StepName from './steps/StepName.jsx'
 import StepBirthEmail from './steps/StepBirthEmail.jsx'
 import StepClubBody from './steps/StepClubBody.jsx'
 import StepReview from './steps/StepReview.jsx'
+import {
+  validateName,
+  validateDob,
+  validateEmail,
+  validateClub,
+  validateHeight,
+  validateWeight,
+} from './validators.js'
 
 const TOTAL_STEPS = 4
 
@@ -12,6 +20,7 @@ const INITIAL_DATA = {
   name: '',
   photo: null,
   photoPreview: null,
+  photoError: null,
   dob: '',
   email: '',
   club: '',
@@ -20,9 +29,15 @@ const INITIAL_DATA = {
 }
 
 function isStepValid(step, data) {
-  if (step === 1) return data.name.trim().length > 0
-  if (step === 2) return data.dob.trim().length > 0 && data.email.trim().length > 0
-  if (step === 3) return data.club.trim().length > 0
+  if (step === 1) return !validateName(data.name)
+  if (step === 2) return !validateDob(data.dob) && !validateEmail(data.email)
+  if (step === 3) {
+    return (
+      !validateClub(data.club) &&
+      !validateHeight(data.height) &&
+      !validateWeight(data.weight)
+    )
+  }
   return true
 }
 
@@ -30,15 +45,26 @@ function Wizard({ onExit }) {
   const [step, setStep] = useState(1)
   const [data, setData] = useState(INITIAL_DATA)
   const [completed, setCompleted] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
 
   const updateData = (patch) => setData((prev) => ({ ...prev, ...patch }))
 
-  const handleNext = () => {
+  const valid = isStepValid(step, data)
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    if (!valid || submitting) return
+
     if (step < TOTAL_STEPS) {
       setStep((s) => s + 1)
-    } else {
-      setCompleted(true)
+      return
     }
+
+    setSubmitting(true)
+    setTimeout(() => {
+      setSubmitting(false)
+      setCompleted(true)
+    }, 900)
   }
 
   const handleBack = () => {
@@ -49,15 +75,17 @@ function Wizard({ onExit }) {
     }
   }
 
-  const valid = isStepValid(step, data)
-
   return (
     <main className="mx-auto max-w-md px-6 py-12">
       {!completed ? (
         <>
           <ProgressBar step={step} total={TOTAL_STEPS} />
 
-          <div className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-neutral-200">
+          <form
+            onSubmit={handleSubmit}
+            noValidate
+            className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-neutral-200"
+          >
             <div className="h-1.5 bg-linear-to-r from-brand-600 to-brand-900" />
             <div className="p-6 sm:p-8">
               {step === 1 && <StepName data={data} onChange={updateData} />}
@@ -74,16 +102,25 @@ function Wizard({ onExit }) {
                   Back
                 </button>
                 <button
-                  type="button"
-                  onClick={handleNext}
-                  disabled={!valid}
-                  className="font-display flex-1 rounded-xl bg-brand-700 py-3 text-base tracking-wide text-white transition hover:bg-brand-800 disabled:cursor-not-allowed disabled:bg-neutral-300"
+                  type="submit"
+                  disabled={!valid || submitting}
+                  className="font-display flex flex-1 items-center justify-center gap-2 rounded-xl bg-brand-700 py-3 text-base tracking-wide text-white transition hover:bg-brand-800 disabled:cursor-not-allowed disabled:bg-neutral-300"
                 >
-                  {step < TOTAL_STEPS ? 'NEXT →' : 'GENERATE STICKER ✨'}
+                  {submitting && (
+                    <span
+                      className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white"
+                      aria-hidden="true"
+                    />
+                  )}
+                  {submitting
+                    ? 'GENERATING...'
+                    : step < TOTAL_STEPS
+                      ? 'NEXT →'
+                      : 'GENERATE STICKER ✨'}
                 </button>
               </div>
             </div>
-          </div>
+          </form>
 
           <StepDots step={step} total={TOTAL_STEPS} />
         </>
