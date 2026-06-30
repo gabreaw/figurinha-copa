@@ -36,8 +36,8 @@ const STEP_META = [
   },
   {
     icon: IconShield,
-    title: 'CLUB & MEASUREMENTS',
-    subtitle: 'Just like the real player cards',
+    title: 'COUNTRY & MEASUREMENTS',
+    subtitle: "Pick the team they're cheering for at the World Cup",
   },
   {
     icon: IconClipboard,

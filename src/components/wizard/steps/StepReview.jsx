@@ -6,7 +6,7 @@ function StepReview({ data }) {
     ['Name', data.name || '—'],
     ['Date of birth', data.dob ? formatDateLong(data.dob) : '—'],
     ['Email', data.email || '—'],
-    ['Club', data.club || '—'],
+    ['Country', data.club || '—'],
     ['Height', data.height ? `${data.height} m` : '—'],
     ['Weight', data.weight ? `${data.weight} kg` : '—'],
   ]
@@ -18,7 +18,7 @@ function StepReview({ data }) {
           className="w-40"
           name={data.name || 'Player name'}
           dob={data.dob ? formatDateShort(data.dob) : 'DOB'}
-          club={data.club || 'Club'}
+          club={data.club || 'Country'}
           photo={data.photoPreview}
           featured
         />

@@ -1,6 +1,6 @@
 import { IconCheck } from '../icons.jsx'
 
-const LABELS = ['Player', 'Birthday', 'Club', 'Review']
+const LABELS = ['Player', 'Birthday', 'Country', 'Review']
 
 function Stepper({ step, total }) {
   return (

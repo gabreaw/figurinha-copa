@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { validateClub, validateHeight, validateWeight } from '../validators.js'
+import { WORLD_CUP_TEAMS } from '../worldCupTeams.js'
 
 function StepClubBody({ data, onChange }) {
   const [touched, setTouched] = useState({ club: false, height: false, weight: false })
@@ -13,20 +14,25 @@ function StepClubBody({ data, onChange }) {
     <div>
       <label className="mb-4 block">
         <span className="mb-2 block text-xs font-semibold tracking-wide text-neutral-700 uppercase">
-          Club name
+          Country
         </span>
-        <input
-          type="text"
+        <select
           autoFocus
-          placeholder="e.g. Riverside FC"
           value={data.club}
           onChange={(e) => onChange({ club: e.target.value })}
           onBlur={() => markTouched('club')}
           aria-invalid={Boolean(clubError)}
-          className={`w-full rounded-xl border px-4 py-3 text-neutral-900 placeholder-neutral-400 outline-none focus:border-brand-700 ${
+          className={`w-full rounded-xl border bg-white px-4 py-3 text-neutral-900 outline-none focus:border-brand-700 ${
             clubError ? 'border-red-400' : 'border-neutral-300'
           }`}
-        />
+        >
+          <option value="">Select a country</option>
+          {WORLD_CUP_TEAMS.map((team) => (
+            <option key={team} value={team}>
+              {team}
+            </option>
+          ))}
+        </select>
         {clubError && <p className="mt-1.5 text-xs text-red-600">{clubError}</p>}
       </label>
 
