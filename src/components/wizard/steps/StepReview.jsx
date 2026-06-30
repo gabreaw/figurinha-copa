@@ -13,7 +13,7 @@ function StepReview({ data }) {
 
   return (
     <div>
-      <div className="mb-6 flex justify-center lg:hidden">
+      <div className="mb-6 flex justify-center">
         <StickerCard
           className="w-40"
           name={data.name || 'Player name'}

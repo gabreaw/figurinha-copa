@@ -4,7 +4,6 @@ import StepName from './steps/StepName.jsx'
 import StepBirthEmail from './steps/StepBirthEmail.jsx'
 import StepClubBody from './steps/StepClubBody.jsx'
 import StepReview from './steps/StepReview.jsx'
-import StickerCard from '../StickerCard.jsx'
 import { IconUser, IconCalendar, IconShield, IconClipboard } from '../icons.jsx'
 import {
   validateName,
@@ -13,7 +12,6 @@ import {
   validateClub,
   validateHeight,
   validateWeight,
-  formatDateShort,
 } from './validators.js'
 
 const TOTAL_STEPS = 4
@@ -103,82 +101,65 @@ function Wizard({ onExit }) {
   }
 
   return (
-    <main className="mx-auto max-w-4xl px-6 py-12">
+    <main className="mx-auto max-w-md px-6 py-12">
       {!completed ? (
         <>
           <Stepper step={step} total={TOTAL_STEPS} />
 
-          <div className="grid gap-8 lg:grid-cols-[1fr_280px] lg:items-start">
-            <form
-              onSubmit={handleSubmit}
-              noValidate
-              className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-neutral-200"
-            >
-              <div className="flex items-start gap-3 bg-brand-950 px-6 py-5 sm:px-8">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-700 text-white">
-                  <Icon />
-                </span>
-                <div>
-                  <p className="text-[11px] font-semibold tracking-widest text-brand-300 uppercase">
-                    Step {step} of {TOTAL_STEPS}
-                  </p>
-                  <h2 className="font-display text-2xl tracking-wide text-white">
-                    {meta.title}
-                  </h2>
-                  <p className="mt-0.5 text-sm text-brand-200">{meta.subtitle}</p>
-                </div>
-              </div>
-
-              <div className="p-6 sm:p-8">
-                {step === 1 && <StepName data={data} onChange={updateData} />}
-                {step === 2 && <StepBirthEmail data={data} onChange={updateData} />}
-                {step === 3 && <StepClubBody data={data} onChange={updateData} />}
-                {step === 4 && <StepReview data={data} />}
-
-                <div className="mt-8 flex gap-3">
-                  <button
-                    type="button"
-                    onClick={handleBack}
-                    className="rounded-xl border border-neutral-300 px-4 py-3 text-sm font-semibold text-neutral-700 hover:bg-neutral-50"
-                  >
-                    Back
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={!valid || submitting}
-                    className="font-display flex flex-1 items-center justify-center gap-2 rounded-xl bg-brand-700 py-3 text-base tracking-wide text-white transition hover:bg-brand-800 disabled:cursor-not-allowed disabled:bg-neutral-300"
-                  >
-                    {submitting && (
-                      <span
-                        className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white"
-                        aria-hidden="true"
-                      />
-                    )}
-                    {submitting
-                      ? 'GENERATING...'
-                      : step < TOTAL_STEPS
-                        ? 'NEXT →'
-                        : 'GENERATE STICKER ✨'}
-                  </button>
-                </div>
-              </div>
-            </form>
-
-            <aside className="hidden lg:block">
-              <div className="sticky top-12">
-                <p className="mb-3 text-xs font-semibold tracking-widest text-neutral-500 uppercase">
-                  Live preview
+          <form
+            onSubmit={handleSubmit}
+            noValidate
+            className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-neutral-200"
+          >
+            <div className="flex items-start gap-3 bg-brand-950 px-6 py-5 sm:px-8">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-700 text-white">
+                <Icon />
+              </span>
+              <div>
+                <p className="text-[11px] font-semibold tracking-widest text-brand-300 uppercase">
+                  Step {step} of {TOTAL_STEPS}
                 </p>
-                <StickerCard
-                  name={data.name || 'Player name'}
-                  dob={data.dob ? formatDateShort(data.dob) : 'DOB'}
-                  club={data.club || 'Club'}
-                  photo={data.photoPreview}
-                  featured
-                />
+                <h2 className="font-display text-2xl tracking-wide text-white">
+                  {meta.title}
+                </h2>
+                <p className="mt-0.5 text-sm text-brand-200">{meta.subtitle}</p>
               </div>
-            </aside>
-          </div>
+            </div>
+
+            <div className="p-6 sm:p-8">
+              {step === 1 && <StepName data={data} onChange={updateData} />}
+              {step === 2 && <StepBirthEmail data={data} onChange={updateData} />}
+              {step === 3 && <StepClubBody data={data} onChange={updateData} />}
+              {step === 4 && <StepReview data={data} />}
+
+              <div className="mt-8 flex gap-3">
+                <button
+                  type="button"
+                  onClick={handleBack}
+                  className="rounded-xl border border-neutral-300 px-4 py-3 text-sm font-semibold text-neutral-700 hover:bg-neutral-50"
+                >
+                  Back
+                </button>
+                <button
+                  type="submit"
+                  disabled={!valid || submitting}
+                  className="font-display flex flex-1 items-center justify-center gap-2 rounded-xl bg-brand-700 py-3 text-base tracking-wide text-white transition hover:bg-brand-800 disabled:cursor-not-allowed disabled:bg-neutral-300"
+                >
+                  {submitting && (
+                    <span
+                      className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white"
+                      aria-hidden="true"
+                    />
+                  )}
+                  {submitting
+                    ? 'GENERATING...'
+                    : step < TOTAL_STEPS
+                      ? 'NEXT →'
+                      : 'GENERATE STICKER ✨'}
+                </button>
+              </div>
+            </div>
+          </form>
         </>
       ) : (
         <div className="mx-auto max-w-md rounded-2xl bg-white p-8 text-center shadow-sm ring-1 ring-neutral-200">
