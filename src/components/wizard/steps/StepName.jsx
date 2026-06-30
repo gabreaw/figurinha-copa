@@ -11,7 +11,7 @@ function StepName({ data, onChange }) {
         <span className="text-3xl" aria-hidden="true">
           ✍️
         </span>
-        <h2 className="font-display mt-2 text-2xl text-neutral-900">
+        <h2 className="font-display mt-2 text-3xl tracking-wide text-brand-950">
           WHAT'S THE PLAYER'S NAME?
         </h2>
         <p className="mt-1 text-sm text-neutral-500">
@@ -26,7 +26,7 @@ function StepName({ data, onChange }) {
           placeholder="First and last name"
           value={data.name}
           onChange={(e) => onChange({ name: e.target.value })}
-          className="w-full rounded-xl border border-neutral-300 px-4 py-3 text-neutral-900 placeholder-neutral-400 outline-none focus:border-neutral-900"
+          className="w-full rounded-xl border border-neutral-300 px-4 py-3 text-neutral-900 placeholder-neutral-400 outline-none focus:border-brand-700"
         />
       </label>
 
@@ -35,7 +35,7 @@ function StepName({ data, onChange }) {
           Player's photo
         </p>
         <div className="grid grid-cols-2 gap-3">
-          <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-neutral-300 px-3 py-6 text-center text-sm text-neutral-600 hover:border-neutral-900">
+          <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-neutral-300 px-3 py-6 text-center text-sm text-neutral-600 hover:border-brand-700">
             {data.photoPreview ? (
               <img
                 src={data.photoPreview}
@@ -60,7 +60,7 @@ function StepName({ data, onChange }) {
             />
           </label>
 
-          <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-neutral-300 px-3 py-6 text-center text-sm text-neutral-600 hover:border-neutral-900">
+          <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-neutral-300 px-3 py-6 text-center text-sm text-neutral-600 hover:border-brand-700">
             <span className="text-2xl" aria-hidden="true">
               📸
             </span>

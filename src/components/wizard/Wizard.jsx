@@ -57,28 +57,31 @@ function Wizard({ onExit }) {
         <>
           <ProgressBar step={step} total={TOTAL_STEPS} />
 
-          <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-neutral-200 sm:p-8">
-            {step === 1 && <StepName data={data} onChange={updateData} />}
-            {step === 2 && <StepBirthEmail data={data} onChange={updateData} />}
-            {step === 3 && <StepClubBody data={data} onChange={updateData} />}
-            {step === 4 && <StepReview data={data} />}
+          <div className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-neutral-200">
+            <div className="h-1.5 bg-linear-to-r from-brand-600 to-brand-900" />
+            <div className="p-6 sm:p-8">
+              {step === 1 && <StepName data={data} onChange={updateData} />}
+              {step === 2 && <StepBirthEmail data={data} onChange={updateData} />}
+              {step === 3 && <StepClubBody data={data} onChange={updateData} />}
+              {step === 4 && <StepReview data={data} />}
 
-            <div className="mt-8 flex gap-3">
-              <button
-                type="button"
-                onClick={handleBack}
-                className="rounded-xl border border-neutral-300 px-4 py-3 text-sm font-semibold text-neutral-700 hover:bg-neutral-50"
-              >
-                Back
-              </button>
-              <button
-                type="button"
-                onClick={handleNext}
-                disabled={!valid}
-                className="font-display flex-1 rounded-xl bg-neutral-900 py-3 text-sm tracking-wide text-white transition hover:bg-neutral-700 disabled:cursor-not-allowed disabled:bg-neutral-300"
-              >
-                {step < TOTAL_STEPS ? 'NEXT →' : 'GENERATE STICKER ✨'}
-              </button>
+              <div className="mt-8 flex gap-3">
+                <button
+                  type="button"
+                  onClick={handleBack}
+                  className="rounded-xl border border-neutral-300 px-4 py-3 text-sm font-semibold text-neutral-700 hover:bg-neutral-50"
+                >
+                  Back
+                </button>
+                <button
+                  type="button"
+                  onClick={handleNext}
+                  disabled={!valid}
+                  className="font-display flex-1 rounded-xl bg-brand-700 py-3 text-base tracking-wide text-white transition hover:bg-brand-800 disabled:cursor-not-allowed disabled:bg-neutral-300"
+                >
+                  {step < TOTAL_STEPS ? 'NEXT →' : 'GENERATE STICKER ✨'}
+                </button>
+              </div>
             </div>
           </div>
 
@@ -89,7 +92,7 @@ function Wizard({ onExit }) {
           <span className="text-4xl" aria-hidden="true">
             🎉
           </span>
-          <h2 className="font-display mt-3 text-2xl text-neutral-900">
+          <h2 className="font-display mt-3 text-3xl tracking-wide text-brand-950">
             STICKER CREATED!
           </h2>
           <p className="mt-2 text-sm text-neutral-500">
@@ -99,7 +102,7 @@ function Wizard({ onExit }) {
           <button
             type="button"
             onClick={onExit}
-            className="font-display mt-6 rounded-xl bg-neutral-900 px-6 py-3 text-sm tracking-wide text-white hover:bg-neutral-700"
+            className="font-display mt-6 rounded-xl bg-brand-700 px-6 py-3 text-base tracking-wide text-white hover:bg-brand-800"
           >
             BACK TO HOME
           </button>

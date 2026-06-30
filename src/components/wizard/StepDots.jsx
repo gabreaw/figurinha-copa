@@ -5,7 +5,7 @@ function StepDots({ step, total }) {
         <span
           key={dot}
           className={`h-2.5 w-2.5 rounded-full ${
-            dot === step ? 'bg-neutral-900' : 'bg-neutral-300'
+            dot === step ? 'bg-brand-700' : 'bg-neutral-300'
           }`}
         />
       ))}

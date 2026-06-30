@@ -5,7 +5,7 @@ function StepClubBody({ data, onChange }) {
         <span className="text-3xl" aria-hidden="true">
           ⚽
         </span>
-        <h2 className="font-display mt-2 text-2xl text-neutral-900">
+        <h2 className="font-display mt-2 text-3xl tracking-wide text-brand-950">
           CLUB & MEASUREMENTS
         </h2>
         <p className="mt-1 text-sm text-neutral-500">
@@ -22,7 +22,7 @@ function StepClubBody({ data, onChange }) {
           placeholder="e.g. Riverside FC"
           value={data.club}
           onChange={(e) => onChange({ club: e.target.value })}
-          className="w-full rounded-xl border border-neutral-300 px-4 py-3 text-neutral-900 placeholder-neutral-400 outline-none focus:border-neutral-900"
+          className="w-full rounded-xl border border-neutral-300 px-4 py-3 text-neutral-900 placeholder-neutral-400 outline-none focus:border-brand-700"
         />
       </label>
 
@@ -37,7 +37,7 @@ function StepClubBody({ data, onChange }) {
             placeholder="1.22"
             value={data.height}
             onChange={(e) => onChange({ height: e.target.value })}
-            className="w-full rounded-xl border border-neutral-300 px-4 py-3 text-neutral-900 placeholder-neutral-400 outline-none focus:border-neutral-900"
+            className="w-full rounded-xl border border-neutral-300 px-4 py-3 text-neutral-900 placeholder-neutral-400 outline-none focus:border-brand-700"
           />
         </label>
 
@@ -51,7 +51,7 @@ function StepClubBody({ data, onChange }) {
             placeholder="24"
             value={data.weight}
             onChange={(e) => onChange({ weight: e.target.value })}
-            className="w-full rounded-xl border border-neutral-300 px-4 py-3 text-neutral-900 placeholder-neutral-400 outline-none focus:border-neutral-900"
+            className="w-full rounded-xl border border-neutral-300 px-4 py-3 text-neutral-900 placeholder-neutral-400 outline-none focus:border-brand-700"
           />
         </label>
       </div>

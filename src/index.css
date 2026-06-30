@@ -1,11 +1,30 @@
 @import "tailwindcss";
 
 @theme {
-  --font-display: "Archivo Black", "Inter", sans-serif;
+  --font-display: "Bebas Neue", "Inter", sans-serif;
   --font-sans: "Inter", system-ui, sans-serif;
+
+  --color-brand-50: #eef2fb;
+  --color-brand-100: #dbe4f7;
+  --color-brand-400: #5e7cd1;
+  --color-brand-600: #2c4ba8;
+  --color-brand-700: #213a87;
+  --color-brand-800: #182a63;
+  --color-brand-900: #101d45;
+  --color-brand-950: #0a1330;
 }
 
 body {
   margin: 0;
   font-family: var(--font-sans);
+}
+
+.field-pattern {
+  background-image: repeating-linear-gradient(
+    135deg,
+    var(--color-brand-100) 0px,
+    var(--color-brand-100) 1px,
+    transparent 1px,
+    transparent 22px
+  );
 }

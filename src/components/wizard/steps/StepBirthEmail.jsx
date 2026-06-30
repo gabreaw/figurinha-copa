@@ -5,7 +5,7 @@ function StepBirthEmail({ data, onChange }) {
         <span className="text-3xl" aria-hidden="true">
           🎂
         </span>
-        <h2 className="font-display mt-2 text-2xl text-neutral-900">
+        <h2 className="font-display mt-2 text-3xl tracking-wide text-brand-950">
           WHEN WERE THEY BORN?
         </h2>
         <p className="mt-1 text-sm text-neutral-500">
@@ -21,7 +21,7 @@ function StepBirthEmail({ data, onChange }) {
           type="date"
           value={data.dob}
           onChange={(e) => onChange({ dob: e.target.value })}
-          className="w-full rounded-xl border border-neutral-300 px-4 py-3 text-neutral-900 outline-none focus:border-neutral-900"
+          className="w-full rounded-xl border border-neutral-300 px-4 py-3 text-neutral-900 outline-none focus:border-brand-700"
         />
       </label>
 
@@ -34,7 +34,7 @@ function StepBirthEmail({ data, onChange }) {
           placeholder="you@example.com"
           value={data.email}
           onChange={(e) => onChange({ email: e.target.value })}
-          className="w-full rounded-xl border border-neutral-300 px-4 py-3 text-neutral-900 placeholder-neutral-400 outline-none focus:border-neutral-900"
+          className="w-full rounded-xl border border-neutral-300 px-4 py-3 text-neutral-900 placeholder-neutral-400 outline-none focus:border-brand-700"
         />
       </label>
     </div>

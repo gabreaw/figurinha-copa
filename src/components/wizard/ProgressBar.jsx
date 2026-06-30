@@ -11,7 +11,7 @@ function ProgressBar({ step, total }) {
       </div>
       <div className="h-2 w-full overflow-hidden rounded-full bg-neutral-200">
         <div
-          className="h-full rounded-full bg-neutral-900 transition-all duration-300"
+          className="h-full rounded-full bg-brand-700 transition-all duration-300"
           style={{ width: `${percent}%` }}
         />
       </div>

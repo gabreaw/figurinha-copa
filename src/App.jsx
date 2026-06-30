@@ -6,7 +6,7 @@ function App() {
   const [started, setStarted] = useState(false)
 
   return (
-    <div className="min-h-screen bg-neutral-100">
+    <div className="min-h-screen bg-neutral-50">
       {started ? (
         <Wizard onExit={() => setStarted(false)} />
       ) : (
