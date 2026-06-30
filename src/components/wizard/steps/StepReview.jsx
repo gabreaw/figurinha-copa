@@ -1,0 +1,50 @@
+import StickerCard from '../../StickerCard.jsx'
+
+function StepReview({ data }) {
+  const rows = [
+    ['Name', data.name || '—'],
+    ['Date of birth', data.dob || '—'],
+    ['Email', data.email || '—'],
+    ['Club', data.club || '—'],
+    ['Height', data.height ? `${data.height} m` : '—'],
+    ['Weight', data.weight ? `${data.weight} kg` : '—'],
+  ]
+
+  return (
+    <div>
+      <div className="mb-6 text-center">
+        <span className="text-3xl" aria-hidden="true">
+          🔍
+        </span>
+        <h2 className="font-display mt-2 text-2xl text-neutral-900">
+          REVIEW & GENERATE
+        </h2>
+        <p className="mt-1 text-sm text-neutral-500">
+          Check everything looks right before we create the sticker
+        </p>
+      </div>
+
+      <div className="mb-6 flex justify-center">
+        <StickerCard
+          className="w-40"
+          name={data.name || 'Player name'}
+          dob={data.dob || 'DOB'}
+          club={data.club || 'Club'}
+          photo={data.photoPreview}
+          featured
+        />
+      </div>
+
+      <dl className="divide-y divide-neutral-200 rounded-xl border border-neutral-200">
+        {rows.map(([label, value]) => (
+          <div key={label} className="flex justify-between px-4 py-3 text-sm">
+            <dt className="text-neutral-500">{label}</dt>
+            <dd className="font-medium text-neutral-900">{value}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  )
+}
+
+export default StepReview
