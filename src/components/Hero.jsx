@@ -1,4 +1,5 @@
 import StickerCard from './StickerCard.jsx'
+import { IconStar } from './icons.jsx'
 
 function Hero({ onStart }) {
   return (
@@ -8,7 +9,7 @@ function Hero({ onStart }) {
       <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-6 py-16 sm:py-24 lg:grid-cols-2 lg:py-32">
         <div className="text-center lg:text-left">
           <span className="inline-flex items-center gap-2 rounded-full border border-brand-700 bg-white px-4 py-1.5 text-xs font-semibold text-brand-700">
-            <span className="text-amber-500" aria-hidden="true">★</span>
+            <IconStar className="h-3.5 w-3.5 text-amber-500" />
             25,000+ stickers created
           </span>
 

@@ -4,7 +4,14 @@ import StepName from './steps/StepName.jsx'
 import StepBirthEmail from './steps/StepBirthEmail.jsx'
 import StepClubBody from './steps/StepClubBody.jsx'
 import StepReview from './steps/StepReview.jsx'
-import { IconUser, IconCalendar, IconShield, IconClipboard } from '../icons.jsx'
+import {
+  IconUser,
+  IconCalendar,
+  IconShield,
+  IconClipboard,
+  IconSparkle,
+  IconTrophy,
+} from '../icons.jsx'
 import {
   validateName,
   validateDob,
@@ -151,11 +158,15 @@ function Wizard({ onExit }) {
                       aria-hidden="true"
                     />
                   )}
-                  {submitting
-                    ? 'GENERATING...'
-                    : step < TOTAL_STEPS
-                      ? 'NEXT →'
-                      : 'GENERATE STICKER ✨'}
+                  {submitting ? (
+                    'GENERATING...'
+                  ) : step < TOTAL_STEPS ? (
+                    'NEXT →'
+                  ) : (
+                    <>
+                      GENERATE STICKER <IconSparkle className="h-4 w-4" />
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -163,8 +174,8 @@ function Wizard({ onExit }) {
         </>
       ) : (
         <div className="mx-auto max-w-md rounded-2xl bg-white p-8 text-center shadow-sm ring-1 ring-neutral-200">
-          <span className="text-4xl" aria-hidden="true">
-            🎉
+          <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-brand-50 text-brand-700">
+            <IconTrophy />
           </span>
           <h2 className="font-display mt-3 text-3xl tracking-wide text-brand-950">
             STICKER CREATED!

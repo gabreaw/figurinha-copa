@@ -1,3 +1,5 @@
+import { IconBall } from './icons.jsx'
+
 function StickerCard({ name, dob, club, photo, featured = false, className = '' }) {
   return (
     <div
@@ -10,8 +12,8 @@ function StickerCard({ name, dob, club, photo, featured = false, className = '' 
           23
         </span>
 
-        <span className="absolute top-3 right-3 flex h-7 w-7 items-center justify-center rounded-full bg-white/15 text-xs text-white/80 ring-1 ring-white/30">
-          ⚽
+        <span className="absolute top-3 right-3 flex h-7 w-7 items-center justify-center rounded-full bg-white/15 text-white/80 ring-1 ring-white/30">
+          <IconBall className="h-4 w-4" />
         </span>
 
         {photo ? (

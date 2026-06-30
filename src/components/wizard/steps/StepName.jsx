@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { validateName } from '../validators.js'
+import { IconPhoto, IconCamera } from '../../icons.jsx'
 
 const MAX_PHOTO_BYTES = 8 * 1024 * 1024
 
@@ -62,9 +63,7 @@ function StepName({ data, onChange }) {
                 className="h-12 w-12 rounded-full object-cover"
               />
             ) : (
-              <span className="text-2xl" aria-hidden="true">
-                🖼️
-              </span>
+              <IconPhoto className="h-6 w-6 text-neutral-400" />
             )}
             <span>
               Upload a photo
@@ -80,9 +79,7 @@ function StepName({ data, onChange }) {
           </label>
 
           <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-neutral-300 px-3 py-6 text-center text-sm text-neutral-600 hover:border-brand-700">
-            <span className="text-2xl" aria-hidden="true">
-              📸
-            </span>
+            <IconCamera className="h-6 w-6 text-neutral-400" />
             <span>Camera</span>
             <input
               type="file"
