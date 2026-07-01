@@ -19,7 +19,9 @@ import {
   validateClub,
   validateHeight,
   validateWeight,
+  formatDateLong,
 } from './validators.js'
+import { compressImage } from './compressImage.js'
 
 const TOTAL_STEPS = 4
 
@@ -76,6 +78,8 @@ function Wizard({ onExit }) {
   const [data, setData] = useState(INITIAL_DATA)
   const [completed, setCompleted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [generatedImage, setGeneratedImage] = useState(null)
+  const [generateError, setGenerateError] = useState(null)
 
   const updateData = (patch) => setData((prev) => ({ ...prev, ...patch }))
 
@@ -83,7 +87,7 @@ function Wizard({ onExit }) {
   const meta = STEP_META[step - 1]
   const Icon = meta.icon
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!valid || submitting) return
 
@@ -92,11 +96,41 @@ function Wizard({ onExit }) {
       return
     }
 
+    if (!data.photo) {
+      setGenerateError('Please go back to step 1 and add a photo before generating the sticker.')
+      return
+    }
+
+    setGenerateError(null)
     setSubmitting(true)
-    setTimeout(() => {
-      setSubmitting(false)
+
+    try {
+      const photo = await compressImage(data.photo)
+      const response = await fetch('/api/generate-sticker', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          photo,
+          name: data.name,
+          dob: data.dob ? formatDateLong(data.dob) : '',
+          country: data.club,
+          height: data.height,
+          weight: data.weight,
+        }),
+      })
+
+      const result = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        throw new Error(result.error || 'Something went wrong generating the sticker.')
+      }
+
+      setGeneratedImage(result.image)
       setCompleted(true)
-    }, 900)
+    } catch (err) {
+      setGenerateError(err.message || 'Something went wrong generating the sticker.')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   const handleBack = () => {
@@ -169,28 +203,49 @@ function Wizard({ onExit }) {
                   )}
                 </button>
               </div>
+              {generateError && (
+                <p className="mt-3 text-center text-sm text-red-600">{generateError}</p>
+              )}
             </div>
           </form>
         </>
       ) : (
         <div className="mx-auto max-w-md rounded-2xl bg-white p-8 text-center shadow-sm ring-1 ring-neutral-200">
-          <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-brand-50 text-brand-700">
-            <IconTrophy />
-          </span>
-          <h2 className="font-display mt-3 text-3xl tracking-wide text-brand-950">
+          {generatedImage ? (
+            <img
+              src={generatedImage}
+              alt={`${data.name || 'Player'}'s generated sticker card`}
+              className="mx-auto w-56 rounded-2xl shadow-xl ring-1 ring-neutral-200"
+            />
+          ) : (
+            <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-brand-50 text-brand-700">
+              <IconTrophy />
+            </span>
+          )}
+          <h2 className="font-display mt-4 text-3xl tracking-wide text-brand-950">
             STICKER CREATED!
           </h2>
           <p className="mt-2 text-sm text-neutral-500">
-            We've sent {data.name || 'the player'}'s sticker card to{' '}
-            {data.email || 'your email'}.
+            Here's {data.name || "the player"}'s custom World Cup sticker card.
           </p>
-          <button
-            type="button"
-            onClick={onExit}
-            className="font-display mt-6 rounded-xl bg-brand-700 px-6 py-3 text-base tracking-wide text-white hover:bg-brand-800"
-          >
-            BACK TO HOME
-          </button>
+          <div className="mt-6 flex justify-center gap-3">
+            {generatedImage && (
+              <a
+                href={generatedImage}
+                download={`${(data.name || 'sticker').replace(/\s+/g, '-').toLowerCase()}.png`}
+                className="font-display rounded-xl border border-neutral-300 px-6 py-3 text-base tracking-wide text-neutral-700 hover:bg-neutral-50"
+              >
+                DOWNLOAD
+              </a>
+            )}
+            <button
+              type="button"
+              onClick={onExit}
+              className="font-display rounded-xl bg-brand-700 px-6 py-3 text-base tracking-wide text-white hover:bg-brand-800"
+            >
+              BACK TO HOME
+            </button>
+          </div>
         </div>
       )}
     </main>
