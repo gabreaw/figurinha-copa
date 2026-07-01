@@ -106,3 +106,20 @@ export function IconStar({ className = 'h-4 w-4' }) {
     </svg>
   )
 }
+
+export function IconCard({ className = 'h-5 w-5' }) {
+  return (
+    <svg {...base({ className })}>
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <path d="M3 10h18M7 15h4" />
+    </svg>
+  )
+}
+
+export function IconPix({ className = 'h-5 w-5' }) {
+  return (
+    <svg {...base({ className })}>
+      <path d="M8.5 8.5 12 12l3.5-3.5a2.5 2.5 0 0 1 3.5 0l1 1a2.5 2.5 0 0 1 0 3.5L16.5 16.5 20 20M15.5 15.5 12 12l-3.5 3.5a2.5 2.5 0 0 1-3.5 0l-1-1a2.5 2.5 0 0 1 0-3.5L7.5 7.5 4 4" />
+    </svg>
+  )
+}

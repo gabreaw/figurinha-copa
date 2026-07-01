@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { validateName } from '../validators.js'
 import { IconPhoto, IconCamera } from '../../icons.jsx'
+import { compressImage } from '../compressImage.js'
 
 const MAX_PHOTO_BYTES = 8 * 1024 * 1024
 
@@ -8,7 +9,7 @@ function StepName({ data, onChange }) {
   const [touched, setTouched] = useState(false)
   const nameError = touched ? validateName(data.name) : null
 
-  const handlePhoto = (e) => {
+  const handlePhoto = async (e) => {
     const file = e.target.files?.[0]
     e.target.value = ''
     if (!file) return
@@ -23,12 +24,24 @@ function StepName({ data, onChange }) {
     }
 
     if (data.photoPreview) URL.revokeObjectURL(data.photoPreview)
-    onChange({ photo: file, photoPreview: URL.createObjectURL(file), photoError: null })
+    onChange({
+      photo: file,
+      photoPreview: URL.createObjectURL(file),
+      photoCompressed: null,
+      photoError: null,
+    })
+
+    try {
+      const photoCompressed = await compressImage(file)
+      onChange({ photoCompressed })
+    } catch {
+      onChange({ photoError: 'Could not process that image, please try another one' })
+    }
   }
 
   const removePhoto = () => {
     if (data.photoPreview) URL.revokeObjectURL(data.photoPreview)
-    onChange({ photo: null, photoPreview: null, photoError: null })
+    onChange({ photo: null, photoPreview: null, photoCompressed: null, photoError: null })
   }
 
   return (

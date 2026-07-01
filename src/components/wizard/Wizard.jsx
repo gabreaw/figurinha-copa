@@ -1,15 +1,16 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Stepper from './Stepper.jsx'
 import StepName from './steps/StepName.jsx'
 import StepBirthEmail from './steps/StepBirthEmail.jsx'
 import StepClubBody from './steps/StepClubBody.jsx'
 import StepReview from './steps/StepReview.jsx'
+import StepPayment from './steps/StepPayment.jsx'
 import {
   IconUser,
   IconCalendar,
   IconShield,
   IconClipboard,
-  IconSparkle,
+  IconCard,
   IconTrophy,
 } from '../icons.jsx'
 import {
@@ -21,9 +22,9 @@ import {
   validateWeight,
   formatDateLong,
 } from './validators.js'
-import { compressImage } from './compressImage.js'
+import { loadPendingOrder, clearPendingOrder } from './paymentSession.js'
 
-const TOTAL_STEPS = 4
+const TOTAL_STEPS = 5
 
 const STEP_META = [
   {
@@ -43,8 +44,13 @@ const STEP_META = [
   },
   {
     icon: IconClipboard,
-    title: 'REVIEW & GENERATE',
-    subtitle: 'Check everything looks right before we create the sticker',
+    title: 'REVIEW & CONTINUE',
+    subtitle: 'Check everything looks right before you pay',
+  },
+  {
+    icon: IconCard,
+    title: 'PAYMENT',
+    subtitle: 'Choose how you want to pay to generate your sticker',
   },
 ]
 
@@ -52,6 +58,7 @@ const INITIAL_DATA = {
   name: '',
   photo: null,
   photoPreview: null,
+  photoCompressed: null,
   photoError: null,
   dob: '',
   email: '',
@@ -73,13 +80,113 @@ function isStepValid(step, data) {
   return true
 }
 
+function getResumeIntent() {
+  if (typeof window === 'undefined') return { mode: 'fresh' }
+  const params = new URLSearchParams(window.location.search)
+  const payment = params.get('payment')
+  if (payment === 'success') return { mode: 'verify', sessionId: params.get('session_id') }
+  if (payment === 'cancelled') return { mode: 'cancelled' }
+  return { mode: 'fresh' }
+}
+
+async function generateFromPendingOrder(pending) {
+  const response = await fetch('/api/generate-sticker', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      photo: pending.photoCompressed,
+      name: pending.name,
+      dob: pending.dob ? formatDateLong(pending.dob) : '',
+      country: pending.country,
+      height: pending.height,
+      weight: pending.weight,
+    }),
+  })
+
+  const result = await response.json().catch(() => ({}))
+  if (!response.ok) {
+    throw new Error(result.error || 'Something went wrong generating the sticker.')
+  }
+  return result.image
+}
+
 function Wizard({ onExit }) {
-  const [step, setStep] = useState(1)
-  const [data, setData] = useState(INITIAL_DATA)
+  const [resumeIntent] = useState(getResumeIntent)
+
+  const [step, setStep] = useState(resumeIntent.mode === 'cancelled' ? TOTAL_STEPS : 1)
+  const [data, setData] = useState(() => {
+    if (resumeIntent.mode === 'cancelled') {
+      const pending = loadPendingOrder()
+      if (pending) {
+        return {
+          ...INITIAL_DATA,
+          name: pending.name,
+          dob: pending.dob,
+          club: pending.country,
+          height: pending.height,
+          weight: pending.weight,
+          photoCompressed: pending.photoCompressed,
+        }
+      }
+    }
+    return INITIAL_DATA
+  })
   const [completed, setCompleted] = useState(false)
-  const [submitting, setSubmitting] = useState(false)
+  const [verifyingPayment, setVerifyingPayment] = useState(resumeIntent.mode === 'verify')
   const [generatedImage, setGeneratedImage] = useState(null)
-  const [generateError, setGenerateError] = useState(null)
+  const [generateError, setGenerateError] = useState(
+    resumeIntent.mode === 'cancelled' ? 'Payment was cancelled. You can try again below.' : null,
+  )
+
+  useEffect(() => {
+    if (resumeIntent.mode !== 'verify') return
+
+    let cancelled = false
+
+    ;(async () => {
+      try {
+        const verifyRes = await fetch(
+          `/api/verify-checkout-session?session_id=${encodeURIComponent(resumeIntent.sessionId ?? '')}`,
+        )
+        const verifyResult = await verifyRes.json().catch(() => ({}))
+        if (!verifyRes.ok || !verifyResult.paid) {
+          throw new Error('We could not verify your payment.')
+        }
+
+        const pending = loadPendingOrder()
+        if (!pending) {
+          throw new Error('We could not find your order details. Please start again.')
+        }
+
+        const image = await generateFromPendingOrder(pending)
+        if (cancelled) return
+
+        setData((prev) => ({
+          ...prev,
+          name: pending.name,
+          dob: pending.dob,
+          club: pending.country,
+          height: pending.height,
+          weight: pending.weight,
+        }))
+        setGeneratedImage(image)
+        setCompleted(true)
+        clearPendingOrder()
+      } catch (err) {
+        if (cancelled) return
+        setGenerateError(err.message || 'Something went wrong.')
+        setStep(TOTAL_STEPS)
+      } finally {
+        if (!cancelled) setVerifyingPayment(false)
+        window.history.replaceState({}, '', window.location.pathname)
+      }
+    })()
+
+    return () => {
+      cancelled = true
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const updateData = (patch) => setData((prev) => ({ ...prev, ...patch }))
 
@@ -87,50 +194,10 @@ function Wizard({ onExit }) {
   const meta = STEP_META[step - 1]
   const Icon = meta.icon
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault()
-    if (!valid || submitting) return
-
-    if (step < TOTAL_STEPS) {
-      setStep((s) => s + 1)
-      return
-    }
-
-    if (!data.photo) {
-      setGenerateError('Please go back to step 1 and add a photo before generating the sticker.')
-      return
-    }
-
-    setGenerateError(null)
-    setSubmitting(true)
-
-    try {
-      const photo = await compressImage(data.photo)
-      const response = await fetch('/api/generate-sticker', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          photo,
-          name: data.name,
-          dob: data.dob ? formatDateLong(data.dob) : '',
-          country: data.club,
-          height: data.height,
-          weight: data.weight,
-        }),
-      })
-
-      const result = await response.json().catch(() => ({}))
-      if (!response.ok) {
-        throw new Error(result.error || 'Something went wrong generating the sticker.')
-      }
-
-      setGeneratedImage(result.image)
-      setCompleted(true)
-    } catch (err) {
-      setGenerateError(err.message || 'Something went wrong generating the sticker.')
-    } finally {
-      setSubmitting(false)
-    }
+    if (!valid || step >= TOTAL_STEPS) return
+    setStep((s) => s + 1)
   }
 
   const handleBack = () => {
@@ -139,6 +206,20 @@ function Wizard({ onExit }) {
     } else {
       setStep((s) => s - 1)
     }
+  }
+
+  if (verifyingPayment) {
+    return (
+      <main className="mx-auto max-w-md px-6 py-24 text-center">
+        <span
+          className="mx-auto block h-8 w-8 animate-spin rounded-full border-4 border-brand-200 border-t-brand-700"
+          aria-hidden="true"
+        />
+        <p className="mt-4 text-sm text-neutral-500">
+          Confirming your payment and generating your sticker…
+        </p>
+      </main>
+    )
   }
 
   return (
@@ -172,6 +253,7 @@ function Wizard({ onExit }) {
               {step === 2 && <StepBirthEmail data={data} onChange={updateData} />}
               {step === 3 && <StepClubBody data={data} onChange={updateData} />}
               {step === 4 && <StepReview data={data} />}
+              {step === 5 && <StepPayment data={data} onError={setGenerateError} />}
 
               <div className="mt-8 flex gap-3">
                 <button
@@ -181,27 +263,15 @@ function Wizard({ onExit }) {
                 >
                   Back
                 </button>
-                <button
-                  type="submit"
-                  disabled={!valid || submitting}
-                  className="font-display flex flex-1 items-center justify-center gap-2 rounded-xl bg-brand-700 py-3 text-base tracking-wide text-white transition hover:bg-brand-800 disabled:cursor-not-allowed disabled:bg-neutral-300"
-                >
-                  {submitting && (
-                    <span
-                      className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white"
-                      aria-hidden="true"
-                    />
-                  )}
-                  {submitting ? (
-                    'GENERATING...'
-                  ) : step < TOTAL_STEPS ? (
-                    'NEXT →'
-                  ) : (
-                    <>
-                      GENERATE STICKER <IconSparkle className="h-4 w-4" />
-                    </>
-                  )}
-                </button>
+                {step < TOTAL_STEPS && (
+                  <button
+                    type="submit"
+                    disabled={!valid}
+                    className="font-display flex flex-1 items-center justify-center gap-2 rounded-xl bg-brand-700 py-3 text-base tracking-wide text-white transition hover:bg-brand-800 disabled:cursor-not-allowed disabled:bg-neutral-300"
+                  >
+                    NEXT →
+                  </button>
+                )}
               </div>
               {generateError && (
                 <p className="mt-3 text-center text-sm text-red-600">{generateError}</p>
@@ -226,7 +296,7 @@ function Wizard({ onExit }) {
             STICKER CREATED!
           </h2>
           <p className="mt-2 text-sm text-neutral-500">
-            Here's {data.name || "the player"}'s custom World Cup sticker card.
+            Here's {data.name || 'the player'}'s custom World Cup sticker card.
           </p>
           <div className="mt-6 flex justify-center gap-3">
             {generatedImage && (
