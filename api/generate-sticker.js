@@ -1,4 +1,6 @@
 import OpenAI, { toFile } from 'openai'
+import fs from 'node:fs'
+import path from 'node:path'
 
 export const config = {
   api: {
@@ -9,12 +11,34 @@ export const config = {
   maxDuration: 60,
 }
 
-function buildPrompt({ name, country, dob, height, weight }) {
+// Reuse one of our own example cards as a layout/style reference image,
+// so the model has a concrete template to match instead of only a text
+// description. If we happen to have a template for the exact country
+// selected, it also gets the jersey/flag right for free.
+const TEMPLATE_BY_COUNTRY = {
+  Mexico: 'mexico.png',
+  Uruguay: 'uruguai.png',
+  Portugal: 'portugal.png',
+  Argentina: 'argentina.png',
+  Germany: 'alemanha.png',
+}
+const FALLBACK_TEMPLATE = 'uruguai.png'
+
+function loadTemplateImage(country) {
+  const filename = TEMPLATE_BY_COUNTRY[country] ?? FALLBACK_TEMPLATE
+  const filePath = path.join(process.cwd(), 'src', 'assets', filename)
+  return fs.readFileSync(filePath)
+}
+
+function buildPrompt({ name, country, dob, height, weight, hasExactTemplate }) {
   return [
-    `Turn the child in the reference photo into a collectible football/soccer sticker card, in the style of an official World Cup sticker album.`,
-    `Keep the child's face and likeness clearly recognizable from the reference photo.`,
-    `Dress them in a ${country} national team jersey with the team's traditional colors.`,
-    `Card design: a bold, oversized number as a background graphic, vibrant color background matching the ${country} team colors, a small circular ${country} flag emblem badge, and a clean name plate at the bottom with the text "${name}" and "${dob} · ${country}"${height ? ` and height ${height}m` : ''}${weight ? ` and weight ${weight}kg` : ''}.`,
+    `You are given two images: the first is a reference photo of a child, the second is an example sticker card template.`,
+    `Recreate the layout, composition and art style of the template exactly (the oversized background number, color blocking, name plate at the bottom, circular flag badge), but with the child from the first photo instead of the template's photo.`,
+    `Keep the child's face and likeness clearly recognizable from the first reference photo.`,
+    hasExactTemplate
+      ? `Keep the template's jersey and flag as-is, since it already matches ${country}.`
+      : `Replace the jersey and flag badge with the ${country} national team's colors and flag instead of the template's.`,
+    `Update the name plate text to read "${name}" and "${dob} · ${country}"${height ? ` and height ${height}m` : ''}${weight ? ` and weight ${weight}kg` : ''}.`,
     `Portrait orientation, sharp studio lighting, cheerful smiling expression, high quality print-ready collectible card illustration. Do not include any real brand logos or trademarks.`,
   ].join(' ')
 }
@@ -43,10 +67,14 @@ export default async function handler(req, res) {
     const imageBuffer = Buffer.from(base64Data, 'base64')
     const imageFile = await toFile(imageBuffer, 'photo.png', { type: 'image/png' })
 
+    const templateBuffer = loadTemplateImage(country)
+    const templateFile = await toFile(templateBuffer, 'template.png', { type: 'image/png' })
+    const hasExactTemplate = country in TEMPLATE_BY_COUNTRY
+
     const result = await openai.images.edit({
       model: 'gpt-image-1',
-      image: imageFile,
-      prompt: buildPrompt({ name, country, dob, height, weight }),
+      image: [imageFile, templateFile],
+      prompt: buildPrompt({ name, country, dob, height, weight, hasExactTemplate }),
       size: '1024x1536',
     })
 
