@@ -76,6 +76,7 @@ export default async function handler(req, res) {
       image: [imageFile, templateFile],
       prompt: buildPrompt({ name, country, dob, height, weight, hasExactTemplate }),
       size: '1024x1536',
+      quality: 'medium',
     })
 
     const image = result.data?.[0]?.b64_json
