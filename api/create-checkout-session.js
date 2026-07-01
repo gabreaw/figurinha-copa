@@ -8,8 +8,7 @@ export const config = {
   },
 }
 
-// TODO: confirm the real price with the product owner.
-const STICKER_PRICE_USD_CENTS = 999
+const STICKER_PRICE_USD_CENTS = 499
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
