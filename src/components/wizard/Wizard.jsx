@@ -89,7 +89,7 @@ function getResumeIntent() {
   return { mode: 'fresh' }
 }
 
-async function generateFromPendingOrder(pending) {
+async function generateFromPendingOrder(pending, sessionId) {
   const response = await fetch('/api/generate-sticker', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -100,6 +100,7 @@ async function generateFromPendingOrder(pending) {
       country: pending.country,
       height: pending.height,
       weight: pending.weight,
+      sessionId,
     }),
   })
 
@@ -145,12 +146,8 @@ function Wizard({ onExit }) {
 
     ;(async () => {
       try {
-        const verifyRes = await fetch(
-          `/api/verify-checkout-session?session_id=${encodeURIComponent(resumeIntent.sessionId ?? '')}`,
-        )
-        const verifyResult = await verifyRes.json().catch(() => ({}))
-        if (!verifyRes.ok || !verifyResult.paid) {
-          throw new Error('We could not verify your payment.')
+        if (!resumeIntent.sessionId) {
+          throw new Error('Missing payment session.')
         }
 
         const pending = loadPendingOrder()
@@ -158,7 +155,7 @@ function Wizard({ onExit }) {
           throw new Error('We could not find your order details. Please start again.')
         }
 
-        const image = await generateFromPendingOrder(pending)
+        const image = await generateFromPendingOrder(pending, resumeIntent.sessionId)
         if (cancelled) return
 
         setData((prev) => ({

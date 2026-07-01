@@ -1,4 +1,5 @@
 import OpenAI, { toFile } from 'openai'
+import Stripe from 'stripe'
 import fs from 'node:fs'
 import path from 'node:path'
 
@@ -49,16 +50,38 @@ export default async function handler(req, res) {
     return
   }
 
+  if (!process.env.STRIPE_SECRET_KEY) {
+    res.status(500).json({ error: 'Server is missing STRIPE_SECRET_KEY' })
+    return
+  }
   if (!process.env.OPENAI_API_KEY) {
     res.status(500).json({ error: 'Server is missing OPENAI_API_KEY' })
     return
   }
 
   try {
-    const { photo, name, dob, country, height, weight } = req.body ?? {}
+    const { photo, name, dob, country, height, weight, sessionId } = req.body ?? {}
 
-    if (!photo || !name || !country) {
-      res.status(400).json({ error: 'Missing photo, name or country' })
+    if (!photo || !name || !country || !sessionId) {
+      res.status(400).json({ error: 'Missing photo, name, country or payment session' })
+      return
+    }
+
+    // Never call OpenAI without confirming, server-side, that this exact
+    // Stripe checkout session was actually paid. The client's word alone
+    // is not enough — this is the only real gate against someone calling
+    // this endpoint directly to generate stickers for free.
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
+    let session
+    try {
+      session = await stripe.checkout.sessions.retrieve(sessionId)
+    } catch {
+      res.status(402).json({ error: 'Invalid payment session' })
+      return
+    }
+
+    if (session.payment_status !== 'paid') {
+      res.status(402).json({ error: 'Payment has not been completed for this order' })
       return
     }
 
