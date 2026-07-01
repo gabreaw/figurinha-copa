@@ -85,6 +85,26 @@ export default async function handler(req, res) {
       return
     }
 
+    // A paid session stays "paid" forever, so payment_status alone doesn't
+    // stop the same session_id being replayed for unlimited generations.
+    // Use the underlying PaymentIntent's metadata as a lightweight,
+    // no-extra-infrastructure "already redeemed" flag.
+    const paymentIntentId =
+      typeof session.payment_intent === 'string'
+        ? session.payment_intent
+        : session.payment_intent?.id
+
+    if (!paymentIntentId) {
+      res.status(402).json({ error: 'Invalid payment session' })
+      return
+    }
+
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId)
+    if (paymentIntent.metadata?.stickerGenerated === 'true') {
+      res.status(409).json({ error: 'This order has already been used to generate a sticker' })
+      return
+    }
+
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
     const base64Data = String(photo).split(',').pop()
     const imageBuffer = Buffer.from(base64Data, 'base64')
@@ -105,6 +125,17 @@ export default async function handler(req, res) {
     const image = result.data?.[0]?.b64_json
     if (!image) {
       throw new Error('OpenAI returned no image')
+    }
+
+    try {
+      await stripe.paymentIntents.update(paymentIntentId, {
+        metadata: { stickerGenerated: 'true' },
+      })
+    } catch (metadataErr) {
+      // The customer already has their (paid-for) image at this point, so
+      // still return it — but log this so a failed "mark as redeemed"
+      // write doesn't silently reopen the replay window unnoticed.
+      console.error('Failed to mark payment as redeemed:', metadataErr)
     }
 
     res.status(200).json({ image: `data:image/png;base64,${image}` })
