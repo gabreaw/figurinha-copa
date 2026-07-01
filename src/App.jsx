@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Hero from './components/Hero.jsx'
+import Testimonials from './components/Testimonials.jsx'
 import Wizard from './components/wizard/Wizard.jsx'
 
 function hasPaymentRedirect() {
@@ -15,7 +16,10 @@ function App() {
       {started ? (
         <Wizard onExit={() => setStarted(false)} />
       ) : (
-        <Hero onStart={() => setStarted(true)} />
+        <>
+          <Hero onStart={() => setStarted(true)} />
+          <Testimonials />
+        </>
       )}
     </div>
   )

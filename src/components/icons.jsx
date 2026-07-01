@@ -123,3 +123,19 @@ export function IconPix({ className = 'h-5 w-5' }) {
     </svg>
   )
 }
+
+export function IconArrowLeft({ className = 'h-4 w-4' }) {
+  return (
+    <svg {...base({ className })}>
+      <path d="M19 12H5M11 6l-6 6 6 6" />
+    </svg>
+  )
+}
+
+export function IconArrowRight({ className = 'h-4 w-4' }) {
+  return (
+    <svg {...base({ className })}>
+      <path d="M5 12h14M13 6l6 6-6 6" />
+    </svg>
+  )
+}
